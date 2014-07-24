@@ -2,7 +2,14 @@ PImage img;
 
 int[][] amat = new int[9][9];
 
+color[][] cmap = new color[9][9];
+
 Dot[] places;
+
+int dis = 999999999;
+int[] path = new int[9];
+
+int mapWidth = 1200;
 
 void setup() {
   size(1200,716);
@@ -19,6 +26,18 @@ void setup() {
   places[6] = new Dot(896,416,"Float","Bankok");
   places[7] = new Dot(942,372,"Penny","Zhongshan");
   places[8] = new Dot(293,376,"Jennie","Florida");
+  
+  
+  
+  for(int i = 0; i<9; i++){
+    for(int j = 0; j<9; j++){
+      cmap[i][j] = color(0,random(155)+100,0);
+    }
+    
+    path[i] = i;
+    
+  }
+  
   
   for(int i = 0; i<9; i++){
     for(int j = 0; j<9; j++){
@@ -75,6 +94,24 @@ void draw() {
    
   image(img,0,0);
   
+  stroke(0,0,255);
+  for(int i = 0; i<9; i++){
+    for(int j = 0; j<9; j++){
+      stroke(cmap[i][j]);
+      bestLine(places[i].xpos,places[i].ypos,places[j].xpos,places[j].ypos);
+    }
+    
+    
+  }
+  
+  
+  for(int i = 0; i<8; i++){
+    stroke(color(255,0,0));
+    bestLine(places[path[i]].xpos,places[path[i]].ypos,places[path[i+1]].xpos,places[path[i+1]].ypos);
+  }
+  
+  //bestLine(places[0].xpos,places[0].ypos,mouseX,mouseY);
+  
   for(int i = 0; i<9; i++){
     places[i].display();
   }
@@ -86,6 +123,59 @@ void draw() {
   
   
 }
+
+boolean bestLine(int txpos1, int typos1, int txpos2, int typos2){
+  
+  if(disType(txpos1, typos1, txpos2, typos2)){
+    if(txpos1 > txpos2){
+      int tempvar = txpos1;
+      txpos1 = txpos2;
+      txpos2 = tempvar;
+      
+      tempvar = typos1;
+      typos1 = typos2;
+      typos2 = tempvar;
+    }
+      
+    
+    line(txpos1, typos1, txpos2-mapWidth, typos2);
+    line(txpos1+mapWidth, typos1, txpos2, typos2);
+    
+    
+  } else {
+    line(txpos1, typos1, txpos2, typos2);
+  }
+  
+  return true;
+}
+
+boolean disType(int txpos1, int typos1, int txpos2, int typos2){
+  boolean myreturn = false;
+  
+  int dis1 = pointDistance(txpos1, typos1, txpos2, typos2);
+  
+  int dis2 = round(sqrt(pow(mapWidth-abs(txpos1-txpos2),2)+pow(typos1-typos2,2)));
+  
+  
+  if(dis2 < dis1){
+    myreturn = true;
+  }
+  
+  return myreturn;
+}
+
+int bestDis(int txpos1, int typos1, int txpos2, int typos2){
+  int dis1 = pointDistance(txpos1, typos1, txpos2, typos2);
+  
+  int dis2 = round(sqrt(pow(mapWidth-abs(txpos1-txpos2),2)+pow(typos1-typos2,2)));
+  
+  return min(dis1,dis2);
+}
+
+int pointDistance(int txpos1, int typos1, int txpos2, int typos2){
+  return round(sqrt(pow(txpos1-txpos2,2)+pow(typos1-typos2,2)));
+}
+
 
 void mousePressed() {
   println(mouseX+", "+mouseY);
